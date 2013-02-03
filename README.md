@@ -154,6 +154,13 @@ If you plan to use Drake with HDFS, please see the [wiki doc on HDFS Compatibili
 
 You can use Drake from your Clojure REPL, via `drake.core/run-workflow`. Please see the [Drake on the REPL wiki page](https://github.com/Factual/drake/wiki/Drake-on-the-REPL) for more details.
 
+## Stuff outside this repo
+
+Thanks to [Lars Yencken](https://github.com/larsyencken), we now have [Vim syntax support](https://bitbucket.org/larsyencken/vim-drake-syntax) for Drake:
+
+
+<img src="https://lh3.googleusercontent.com/-mqNpFqf7P0k/UQoXkpAqr1I/AAAAAAAAADU/U5zrvozVmzE/s400/image.png"/>
+
 ## License
 
 Source Copyright © 2012-2013 Factual, Inc.
