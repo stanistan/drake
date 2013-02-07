@@ -83,3 +83,9 @@ Of course, we don't expect **you** to love Clojure, or Lisp, or want to
 work in it. Drake will happily support any language you can dream of, as long
 your scripts can be called via the shell. And Drake includes inline support
 for a variety of languages besides Clojure, including Ruby and Python.
+
+# How can I contribute to the Drake project?
+
+Thanks for asking! We are actively interested in accepting code submissions, but reports, and
+any kind of help whatsoever. Please feel free to send us pull requests or file
+a ticket through the main github repo.
