@@ -59,7 +59,7 @@ and have fun in Clojure-land!
 
 ### How can I use Drake as a library from Java?
 
-Check out the TODO. But please be aware that **you're going the wrong way**.
+Check out the TODO. But please be aware that __you're going the wrong way__.
 
 ### Why do I get an `ERROR java.io.IOException` when I try using Drake with HDFS?
 
