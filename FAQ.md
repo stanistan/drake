@@ -1,6 +1,6 @@
 # FAQ
 
-### How is Drake different than my favorite tool, X? 
+### How is Drake different than my favorite tool, X?
 
 We may not know X, but if you're using it we bet it's a great tool! What we
 can share with you is that we put a lot of thought and work into building
@@ -24,7 +24,7 @@ feature's we've chosen to focus on.
 All that said, if you've found a tool that is more ideal for your purposes,
 far be it from us to try to make you use Drake. Keep on rockin'!
 
-### How is Drake different than Make? 
+### How is Drake different than Make?
 
 Drake has some basic similarities to Make, since Drake's design was largely
 inspired by Make's basic approach to dependency resolution. However,
@@ -52,10 +52,14 @@ anywhere in your workflow, e.g. to dynamically define target names, etc.
 Default values can be dfined in your workflow, and you can override them on the
 command line when you call Drake. See TODO for more details.
 
-### How can I use Drake as a library, or from my Clojure REPL?
+### How can I use Drake as a Clojure library or on my Clojure REPL?
 
 Check out the [Drake on the REPL wiki page](https://github.com/Factual/drake/wiki/Drake-on-the-REPL),
 and have fun in Clojure-land!
+
+### How can I use Drake as a library from Java?
+
+Check out the TODO. But please be aware that **you're going the wrong way**.
 
 ### Why do I get an `ERROR java.io.IOException` when I try using Drake with HDFS?
 
