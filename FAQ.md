@@ -62,7 +62,7 @@ and have fun in Clojure-land!
 It could be that your build of Drake is not using a Hadoop client library that
 is compatible with your cluster. Please see [the wiki entry on HDFS compatibility](https://github.com/Factual/drake/wiki/HDFS-Compatibility).
 
-# Why doesn't Drake recognize I have up-to-date output in HDFS?
+# Why doesn't Drake recognize I have up-to-date targets in HDFS?
 
 Drake looks for Hadoop configuration in `/etc/hadoop/conf/core-site.xml`. It
 may be that in your environment, you keep your Hadoop configuration elsewhere.
@@ -82,4 +82,4 @@ which we use in Drake for parsing.
 Of course, we don't expect **you** to love Clojure, or Lisp, or want to
 work in it. Drake will happily support any language you can dream of, as long
 your scripts can be called via the shell. And Drake includes inline support
-for a variety of languages besdies Clojure, including Ruby and Python.
+for a variety of languages besides Clojure, including Ruby and Python.
