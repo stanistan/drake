@@ -48,6 +48,15 @@ TODO: elaborate
 If you find BPipe to be the best solution for your problem, that's
 great! As always, YMMV.
 
+# Doesn't the slow JVM startup time drive Drake users crazy?
+
+It did, before we [learned to use Drip](https://github.com/Factual/drake/wiki/Faster-startup:-Drake-with-Drip)!
+
+# How can I use Drake as a library, or from my Clojure REPL?
+
+Check out the [Drake on the REPL wiki page](https://github.com/Factual/drake/wiki/Drake-on-the-REPL),
+and have fun in Clojure-land!
+
 # Why do I get an `ERROR java.io.IOException` when I try using Drake with HDFS?
 
 It could be that your build of Drake is not using a Hadoop client library that
@@ -69,3 +78,8 @@ Clojure has a very good syntax for Java interop, so all Java libraries are
 available to us. But, of course, Clojure community also spits out libraries
 like crazy, for example, take a look at [fnparse](https://github.com/joshua-choi/fnparse),
 which we use in Drake for parsing.
+
+Of course, we don't expect **you** to love Clojure, or Lisp, or want to
+work in it. Drake will happily support any language you can dream of, as long
+your scripts can be called via the shell. And Drake includes inline support
+for a variety of languages besdies Clojure, including Ruby and Python.
