@@ -21,7 +21,7 @@
         drake.utils)
   (:gen-class :methods [#^{:static true} [run_opts [java.util.Map] void]]))
 
-(def VERSION "0.1.3-SNAPSHOT")
+(def VERSION "0.1.3-SNAPSHOT-B")
 
 ;; TODO(artem)
 ;; Optimize for repeated BASE prefixes (we can't just show it
@@ -628,6 +628,10 @@
                      "Specifies a properties file containing aws credentials. The access_id should be in a property named 'access_key', while the secret part of the key should be in a property names 'secret_key'. Other values in the properties file are ignored."
                      :type :str
                      :user-name "properties-file")
+                   (with-arg work-dir W
+                     "Specifies the work directory to use. This is used to store step command scripts, etc."
+                     :type :str
+                     :user-name "ms")
                    (no-arg quiet q
                      "Suppress all Drake's output.")
                    (no-arg debug
@@ -647,7 +651,8 @@
         ;; to the option map with nil value. here we convert them to true.
         ;; also, the defaults are specified here.
         options (into {:workflow "./Drakefile"
-                       :logfile "drake.log"}
+                       :logfile "drake.log"
+                       :work-dir ".drake"}
                       (for [[k v] options] [k (if (nil? v) true v)]))]
     (flush)    ;; we need to do it for help to always print out
     (let [targets (if (empty? targets) ["=..."] targets)]
