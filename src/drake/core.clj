@@ -455,8 +455,9 @@
   [args]
   (let [non-flag-long #{"--workflow" "--branch" "--merge-branch"
                         "--logfile" "--vars" "--base"
-                        "--aws-credentials" "--step-delay"}
-        non-flag-short #{\w \b \l \v \s}]
+                        "--aws-credentials" "--step-delay"
+                        "--work-dir"}
+        non-flag-short #{\w \b \l \v \s \W}]
     (loop [i 0]
       (if (>= i (count args))
         [args []]
@@ -584,6 +585,9 @@
   (let [[opts targets] (split-command-line (into [] args))
         ;; We ignore 80 character limit here, since clojopts is a macro
         ;; and calls to (str) do not work inside a clojopts call
+        ;;
+        ;; To add an opt using with-arg, you also need to modify the function
+        ;; split-command-line above.
         options (try
                   (clojopts
                    "drake"
@@ -593,7 +597,7 @@
                      :type :str
                      :user-name "file-or-dir-name")
                    (no-arg auto a
-                     "Do not ask for user confirmation before running steps.")
+                           "Do not ask for user confirmation before running steps.")
                    (no-arg preview P
                            "Prints the steps that would run, then stops.")
                    (with-arg base
@@ -613,13 +617,13 @@
                      :type :str
                      :user-name "name")
                    (no-arg print p
-                     "Runs Drake in \"print\" mode. Instead of executing steps, Drake just prints inputs, outputs and tags of each step that is scheduled to run to stdout. This is useful if some outside actions need to be taken before or after running Drake. Standard target matching rules apply. Inputs are prepended by I, outputs by O, and input and output tags by %I and %O respectively. It also outputs \"S\" to signify beginning of each step.")
+                           "Runs Drake in \"print\" mode. Instead of executing steps, Drake just prints inputs, outputs and tags of each step that is scheduled to run to stdout. This is useful if some outside actions need to be taken before or after running Drake. Standard target matching rules apply. Inputs are prepended by I, outputs by O, and input and output tags by %I and %O respectively. It also outputs \"S\" to signify beginning of each step.")
                    (with-arg logfile l
                      "Specify the log file. If not absolute, will be relative to the workflow file, default is drake.log in the directory of the workflow file."
                      :type :str
                      :user-name "filename")
                    (no-arg repl r
-                     "Supports REPL based running of Drake; foregoes JVM shutdown, et. al.")
+                           "Supports REPL based running of Drake; foregoes JVM shutdown, et. al.")
                    (with-arg step-delay
                      "Specifies a period of time, in milliseconds, to wait after completion of each step. Some file systems have low timestamp resolution, and small steps can proceed so quickly that outputs of two or more steps can share the same timestamp, and will be re-built on a subsequent run of Drake. Also, if the clocks on HDFS and local filesystem are not perfectly synchronized, timestamped evaluation can break down. Specifying a delay can help in both cases."
                      :type :int
@@ -631,21 +635,21 @@
                    (with-arg work-dir W
                      "Specifies the work directory to use. This is used to store step command scripts, etc."
                      :type :str
-                     :user-name "ms")
+                     :user-name "dir-name")
                    (no-arg quiet q
-                     "Suppress all Drake's output.")
+                           "Suppress all Drake's output.")
                    (no-arg debug
-                     "Turn on verbose debugging output.")
+                           "Turn on verbose debugging output.")
                    (no-arg trace
-                     "Turn on even more verbose debugging output.")
+                           "Turn on even more verbose debugging output.")
                    (no-arg version
-                     "Show version information."))
+                           "Show version information."))
                   (catch IllegalArgumentException e
                     (println
-                      (str "\nUnrecognized option: "
-                           "did you mean target exclusion?\nto build "
-                           "everything except 'target'"
-                           " run:\n  drake ... -target"))
+                     (str "\nUnrecognized option: "
+                          "did you mean target exclusion?\nto build "
+                          "everything except 'target'"
+                          " run:\n  drake ... -target"))
                     (shutdown -1)))
         ;; if a flag is specified, clojopts adds the corresponding key
         ;; to the option map with nil value. here we convert them to true.
@@ -654,7 +658,7 @@
                        :logfile "drake.log"
                        :work-dir ".drake"}
                       (for [[k v] options] [k (if (nil? v) true v)]))]
-    (flush)    ;; we need to do it for help to always print out
+    (flush) ;; we need to do it for help to always print out
     (let [targets (if (empty? targets) ["=..."] targets)]
       (when (options :version)
         (println "Drake Version" VERSION "\n")
@@ -670,16 +674,16 @@
       (debug "parsed targets:" targets)
 
       (try+
-       (let [fn (if (empty? (:merge-branch options)) run merge-branch)]
-         (with-workflow-file #(fn % targets)))
-       (shutdown 0)
-       (catch map? m
-         (error (str "drake: " (m :msg)))
-         (shutdown (or (get m :exit) 1)))
-       (catch Exception e
-         (.printStackTrace e)
-         (error (stack-trace-str e))
-         (shutdown 1))))))
+        (let [fn (if (empty? (:merge-branch options)) run merge-branch)]
+          (with-workflow-file #(fn % targets)))
+        (shutdown 0)
+        (catch map? m
+          (error (str "drake: " (m :msg)))
+          (shutdown (or (get m :exit) 1)))
+        (catch Exception e
+          (.printStackTrace e)
+          (error (stack-trace-str e))
+          (shutdown 1))))))
 
 (defn run-opts [opts]
   (let [opts (merge {:auto true} opts)]
