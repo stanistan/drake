@@ -1,8 +1,15 @@
-(defproject factual/drake "0.1.4-SNAPSHOT"
+(defproject factual/drake "0.1.5-SNAPSHOT"
   :description "Drake: the data processing workflow tool (a.k.a. 'make for data')"
   :url "https://github.com/Factual/drake"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+
+
+
+  :repositories {"factual" "http://maven.corp.factual.com/nexus/content/groups/public"
+                 "releases" "http://maven.corp.factual.com/nexus/content/repositories/releases"
+                 "snapshots" "http://maven.corp.factual.com/nexus/content/repositories/snapshots"}
+
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/tools.logging "0.2.3"]
                  [clj-logging-config "1.9.6"]
@@ -18,9 +25,12 @@
                  ;; for HDFS support
                  [hdfs-clj "0.1.0"]
                  ;; you may need to change this to be compatible with your cluster
-                 [org.apache.hadoop/hadoop-core "0.20.2"]
+                 [org.apache.hadoop/hadoop-core "0.20.2-cdh3u4"]
                  ;; for AWS S3 support
-                 [clj-aws-s3 "0.3.3"]]
+                 [clj-aws-s3 "0.3.3"]
+
+                 ;; experimental support for vineyard
+                 [factual/vineyard-java-driver "1.7.2"]]
   :test-selectors {:regression   :regression
                    :default      (complement :regression)
                    :all          (constantly true)}

@@ -14,7 +14,8 @@
             [c4.apis.google :as google]
             [sosueme.conf :as conf]
             [fs.core :as fs]
-            [retry.core :as retry])
+            [retry.core :as retry]
+            [drake.vineyard :as vin])
   (:use [clojure.tools.logging :only [debug]]
         [slingshot.slingshot :only [throw+]]
         factql.core
@@ -196,6 +197,12 @@
     (write (<rows>))
     (f step)))
 
+
+(defn exec-vineyard [step]
+  (let [clj-str (str/join "\n" (:cmds step))]
+    ;; Assume clj-str evals to a hash-map of Task init data
+    (vin/vpush (:opts step) (read-string clj-str))))
+
 (defn- register-c4-protocol!
   [[protocol-name func]]
   (register-protocols! protocol-name
@@ -207,6 +214,14 @@
 (dorun (map register-c4-protocol! [["c4" exec-c4]
                                    ["c4row" exec-row-xform]
                                    ["c4rows" exec-rows]]))
+
+(register-protocols! "vineyard"
+                       (reify Protocol
+                         (cmds-required? [_] false)
+                         (run [_ step]
+                           (exec-vineyard step))))
+
+
 
 ;; DESIGN TODO(aaron):
 ;; Error handling, skipping, backoff/retry, resume, log errors?
