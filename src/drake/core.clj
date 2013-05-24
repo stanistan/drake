@@ -17,14 +17,11 @@
         drake.fs
         [drake.protocol :only [get-protocol-name get-protocol]]
         drake.parser
+        drake.options
         drake.utils)
-  (:gen-class))
+  (:gen-class :methods [#^{:static true} [run_opts [java.util.Map] void]]))
 
-(def VERSION "0.1.2")
-
-(def ^:dynamic *options* {})
-(defn set-options [opts]
-  (def ^:dynamic *options* opts))
+(def VERSION "0.1.3")
 
 ;; TODO(artem)
 ;; Optimize for repeated BASE prefixes (we can't just show it
@@ -228,7 +225,7 @@
                  [new-target-steps triggered-deps]
                  [(conj new-target-steps (assoc step :cause cause))
                   (set/union triggered-deps
-                             ((:deps-func parse-tree) index))])))
+                             (all-dependencies parse-tree index))])))
            [[] {}]
            target-steps)))
 
@@ -385,7 +382,7 @@
     (.endsWith java-cmd "nailgun.NGServer")))
 
 (defn- shutdown [exit-code]
-  (when-not (:repl *options*)
+  (when (not (true? (:repl *options*)))
     (if (running-under-nailgun?)
       (debug (str "core/shutdown: Running under Nailgun; "
                   "not calling (shutdown-agents)"))
@@ -411,7 +408,9 @@
 (defn build-vars []
   (merge
    (into {} (System/getenv))
-   (parse-cli-vars (*options* :vars))))
+   (parse-cli-vars (*options* :vars))
+   (when-let [base (*options* :base)]
+     {"BASE" base})))
 
 (defn- with-workflow-file
   "Reads the workflow file from command-line options, parses it,
@@ -422,7 +421,7 @@
                    filename
                    (let [workflow-file (str filename
                                             (if (not= (last filename) \/) "/")
-                                            "workflow.d")]
+                                            "Drakefile")]
                      (println "Checking for" workflow-file)
                      workflow-file))]
     (if-not (fs/exists? filename)
@@ -455,8 +454,9 @@
    Returns a tuple of vectors."
   [args]
   (let [non-flag-long #{"--workflow" "--branch" "--merge-branch"
-                        "--logfile" "--vars"}
-        non-flag-short #{\w \b \l \v}]
+                        "--logfile" "--vars" "--base"
+                        "--aws-credentials" "--step-delay"}
+        non-flag-short #{\w \b \l \v \s}]
     (loop [i 0]
       (if (>= i (count args))
         [args []]
@@ -576,7 +576,7 @@
      (-main \"--repl\" \"--version\")
      (-main \"--repl\" \"--preview\" \"-w\" \"demos/factual\" \"+...\")
      (-main \"--repl\" \"--auto\" \"-w\"
-            \"some/workflow.d\" drake \"+...\" \"-^D\" \"-=B\")
+            \"some/workflow-file.drake\" drake \"+...\" \"-^D\" \"-=B\")
 
    TODO: log messages don't show up on the REPL (but printlns do).
          Can this be fixed?"
@@ -589,13 +589,17 @@
                    "drake"
                    opts
                    (with-arg workflow w
-                     "Name of the workflow file to execute; if a directory, look for workflow.d there."
+                     "Name of the workflow file to execute; if a directory, look for Drakefile there."
                      :type :str
                      :user-name "file-or-dir-name")
                    (no-arg auto a
                      "Do not ask for user confirmation before running steps.")
                    (no-arg preview P
-                     "Prints the steps that would run, then stops.")
+                           "Prints the steps that would run, then stops.")
+                   (with-arg base
+                     "Specifies BASE directory. Takes precedence over environment."
+                     :type :str
+                     :user-name "dir-name")
                    (with-arg vars v
                      "Add workflow variable definitions. For example -v X=1,Y=2,FILE=a.csv"
                      :type :str
@@ -620,6 +624,10 @@
                      "Specifies a period of time, in milliseconds, to wait after completion of each step. Some file systems have low timestamp resolution, and small steps can proceed so quickly that outputs of two or more steps can share the same timestamp, and will be re-built on a subsequent run of Drake. Also, if the clocks on HDFS and local filesystem are not perfectly synchronized, timestamped evaluation can break down. Specifying a delay can help in both cases."
                      :type :int
                      :user-name "ms")
+                   (with-arg aws-credentials s
+                     "Specifies a properties file containing aws credentials. The access_id should be in a property named 'access_key', while the secret part of the key should be in a property names 'secret_key'. Other values in the properties file are ignored."
+                     :type :str
+                     :user-name "properties-file")
                    (no-arg quiet q
                      "Suppress all Drake's output.")
                    (no-arg debug
@@ -638,7 +646,7 @@
         ;; if a flag is specified, clojopts adds the corresponding key
         ;; to the option map with nil value. here we convert them to true.
         ;; also, the defaults are specified here.
-        options (into {:workflow "./workflow.d"
+        options (into {:workflow "./Drakefile"
                        :logfile "drake.log"}
                       (for [[k v] options] [k (if (nil? v) true v)]))]
     (flush)    ;; we need to do it for help to always print out
@@ -668,7 +676,23 @@
          (error (stack-trace-str e))
          (shutdown 1))))))
 
+(defn run-opts [opts]
+  (let [opts (merge {:auto true} opts)]
+    (set-options opts)
+    (with-workflow-file #(run % (:targetv opts)))))
+
+(defn -run_opts
+  "Explicitly for use from Java"
+  [opts]
+  (run-opts (into {} (for [[k v] opts] [(keyword k) v]))))
+
 (defn run-workflow
+  ([workflow & {:as opts}]
+     (run-opts (merge opts {:workflow workflow})))
+   ([]
+    (run-opts {})))
+
+#_(defn run-workflow
   "This can be called from the REPL or Clojure code as a way of
    using this ns as a library. Runs in auto mode, meaning there
    won't be an interactive user confirmation before running steps.
@@ -680,7 +704,7 @@
      (run-workflow \"demos/factual\" [])
      (run-workflow \"demos/factual\" [\"+...\"])
      (run-workflow \"demos/factual\" [\"+...\"] :branch \"MYBRANCH\")
-     (run-workflow \"some/workflow.d\" [\"+...\" \"-^D\" \"-=B\"]
+     (run-workflow \"some/workflow-file.drake\" [\"+...\" \"-^D\" \"-=B\"]
                    :branch \"MYBRANCH\" :preview true)
 
    TODO: log messages don't show up on the REPL (but printlns do).
