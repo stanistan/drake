@@ -34,6 +34,7 @@ as opposed to software project build management. Drake has specific features
 related to today's data processing challenges that you won't find in Make:
 
 * HDFS support
+* S3 support
 * Easy handling of multiple outputs from a single step
 * Mulitple language support inline, e.g. Ruby, Python, Clojure
 * Integration with common data analysis tools, e.g. R
@@ -79,18 +80,18 @@ Try copying or symlinking your Hadoop configuration to `/etc/hadoop/conf/core-si
 ### Why is Drake written in Clojure?
 
 We love Clojure at Factual. Lisp is an extremely powerful language, and
-Clojure brings all this to the practical JVM world. And Lisp is quite good
-in operating on lists and graphs, which is a big part of Drake.
+Clojure brings this power to the practical JVM world.
 
-Clojure has a very good syntax for Java interop, so all Java libraries are
-available to us. But, of course, Clojure community also spits out libraries
-like crazy, for example, take a look at [fnparse](https://github.com/joshua-choi/fnparse),
+Clojure is quite good when working with lists and graphs -- a huge part of Drake's requirements.
+
+Clojure has full Java interop, making all Java libraries available to us. Plus the Clojure community spits out libraries
+like crazy. For example, take a look at [fnparse](https://github.com/joshua-choi/fnparse),
 which we use in Drake for parsing.
 
-Of course, we don't expect **you** to love Clojure, or Lisp, or want to
+However, we don't expect **you** to love Clojure, or Lisp, or want to
 work in it. Drake will happily support any language you can dream of, as long
 your scripts can be called via the shell. And Drake includes inline support
-for a variety of languages besides Clojure, including Ruby and Python.
+for a variety of languages besides Clojure, including Ruby, Python, and R.
 
 ### How can I contribute to the Drake project?
 
