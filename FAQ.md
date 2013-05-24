@@ -34,6 +34,7 @@ as opposed to software project build management. Drake has specific features
 related to today's data processing challenges that you won't find in Make:
 
 * HDFS support
+* S3 support
 * Easy handling of multiple outputs from a single step
 * Mulitple language support inline, e.g. Ruby, Python, Clojure
 * Integration with common data analysis tools, e.g. R
