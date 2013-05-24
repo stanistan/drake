@@ -11,9 +11,10 @@ to achieve, or downright lacking, in many popular tools:
 * multiple outputs
 * no-input and no-output steps
 * HDFS support
-* forced execution of any subbranch, up or down the tree or any individual targets (crucial for debugging and development)
+* S3 support
+* precise control over step execution
 * target exclusions
-* protocol abstraction - e.g., inline Python, R, Ruby, Clojure
+* flexible interpreter abstractions - e.g., inline Python, R, Ruby, Clojure
 * tags
 * branching
 * methods
@@ -36,6 +37,7 @@ related to today's data processing challenges that you won't find in Make:
 * Easy handling of multiple outputs from a single step
 * Mulitple language support inline, e.g. Ruby, Python, Clojure
 * Integration with common data analysis tools, e.g. R
+* Detailed reporting
 
 Of course, if you find Make to be the best solution for your problem, that's
 great! As always, YMMV.
@@ -44,13 +46,15 @@ great! As always, YMMV.
 
 It did, before we [learned to use Drip](https://github.com/Factual/drake/wiki/Faster-startup:-Drake-with-Drip)!
 
-### Is there a way to pass parameters to a Drake workflow?
+### Can I pass variables into a Drake workflow?
 
 Yes, Drake lets you define workflow variables which can be used just about
-anywhere in your workflow, e.g. to dynamically define target names, etc.
+anywhere in your workflow, such as to dynamically define target names, etc.
 
-Default values can be dfined in your workflow, and you can override them on the
-command line when you call Drake. See TODO for more details.
+Default values can be defined in your workflow, and you can override them on the
+command line when you call Drake. You can also specify values via the command line environment.
+
+See the [Variables wiki page](https://github.com/Factual/drake/wiki/Variables) for more details.
 
 ### How can I use Drake as a Clojure library or on my Clojure REPL?
 
@@ -59,7 +63,7 @@ and have fun in Clojure-land!
 
 ### How can I use Drake as a library from Java?
 
-Check out the TODO. But please be aware that _you're going the wrong way_.
+You can use the `run-opts` function from drake.core, which is exposed as a public static method. But please be aware that _you're going the wrong way_.
 
 ### Why do I get an `ERROR java.io.IOException` when I try using Drake with HDFS?
 
