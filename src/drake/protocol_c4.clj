@@ -201,7 +201,7 @@
 (defn exec-vineyard [step]
   (let [clj-str (str/join "\n" (:cmds step))]
     ;; Assume clj-str evals to a hash-map of Task init data
-    (vin/vpush (:opts step) (read-string clj-str))))
+    (vin/run-task (:opts step) (read-string clj-str))))
 
 (defn- register-c4-protocol!
   [[protocol-name func]]
