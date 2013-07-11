@@ -21,7 +21,7 @@
         drake.utils)
   (:gen-class :methods [#^{:static true} [run_opts [java.util.Map] void]]))
 
-(def VERSION "0.1.3")
+(def VERSION "0.1.3-vineyard-empty-dir-async")
 
 ;; TODO(artem)
 ;; Optimize for repeated BASE prefixes (we can't just show it
