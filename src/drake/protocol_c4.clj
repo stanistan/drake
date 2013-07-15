@@ -199,9 +199,18 @@
 
 
 (defn exec-vineyard [step]
-  (let [clj-str (str/join "\n" (:cmds step))]
+  (let [clj-str (str/join "\n" (:cmds step))
+        task-map (read-string clj-str)
+        inject? (get-in step [:opts :inject-vars])
+        prefixes (get-in step [:opts :var-prefixes-allowed])
+        prefixes (if prefixes (clojure.string/split prefixes #"\/") prefixes)
+        filt (fn [s] (if prefixes (some #(.startsWith (first s) %) prefixes) true))
+        vars (:vars step)
+        vars (into {} (filter filt (for [[k v] vars] [(str k) (str v)])))
+        vars {"init_data" vars}
+        task-map-injected (merge-with merge vars task-map)]
     ;; Assume clj-str evals to a hash-map of Task init data
-    (vin/run-task (:opts step) (read-string clj-str))))
+    (vin/run-task (:opts step) (if inject? task-map-injected task-map))))
 
 (defn- register-c4-protocol!
   [[protocol-name func]]
