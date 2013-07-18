@@ -203,7 +203,7 @@
         task-map (read-string clj-str)
         inject? (get-in step [:opts :inject-vars])
         prefixes (get-in step [:opts :var-prefixes-allowed])
-        inject? (or inject prefixes) ; if var-prefixes specified for injection, assume injection
+        inject? (or inject? prefixes) ; if var-prefixes specified for injection, assume injection
         prefixes (if prefixes (clojure.string/split prefixes #"\/") prefixes)
         filt (fn [s] (if prefixes (some #(.startsWith (first s) %) prefixes) true))
         vars (:vars step)
