@@ -67,8 +67,9 @@
                  (active-task-id conf task)
                  (push-new-task conf task))]
     (println "drake.vineayrd/run-task: waiting on task" task-id "...")
-    (wait-for conf task-id)
-    (fs/delete (task-file conf task))))
+    (try
+      (wait-for conf task-id)
+      (finally (fs/delete (task-file conf task))))))
 
 
 
