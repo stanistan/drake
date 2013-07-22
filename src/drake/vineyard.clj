@@ -53,7 +53,9 @@
     (loop []
       (when-not (done? task)
         (Thread/sleep 1500)
-        (recur)))))
+        (recur)))
+   (when (= vineyard.Task$Status/ERROR (.getStatusRemote task))
+     (throw (Exception. "Error running Vineyard task")))))
 
 (defn run-task
   "Runs the specified task and waits for it to be DONE.
