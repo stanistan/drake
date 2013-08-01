@@ -1,5 +1,7 @@
 (ns drake.vineyard
   (:require [fs.core :as fs])
+  (:use [clojure.tools.logging :only [info debug]]
+        [slingshot.slingshot :only [throw+]])
   (:import [vineyard Task TaskQueue]))
 
 (def END-STATUS #{vineyard.Task$Status/DONE
@@ -39,10 +41,10 @@
    Returns the task's unique task id."
   [{:keys [host port resource] :as conf} task]
   (let [q (task-queue host port resource)
-        _ (println "drake.vineayrd/push-new-task: Pushing task to" host port resource "...")
+        _ (info "drake.vineayrd/push-new-task: Pushing task to" host port resource "...")
         task-id (.addTask q task)]
     (create-task-file conf task task-id)
-    (println "drake.vineayrd/push-new-task: Pushed task" task-id)
+    (info "drake.vineayrd/push-new-task: Pushed task" task-id)
     task-id))
 
 (defn done? [task]
@@ -55,7 +57,7 @@
         (Thread/sleep 1500)
         (recur)))
    (when (= vineyard.Task$Status/ERROR (.getStatusRemote task))
-     (throw (Exception. "Error running Vineyard task")))))
+     (throw (Exception. (str "Error running Vineyard task: " task-id))))))
 
 (defn run-task
   "Runs the specified task and waits for it to be DONE.
@@ -66,7 +68,7 @@
   (let [task-id (or
                  (active-task-id conf task)
                  (push-new-task conf task))]
-    (println "drake.vineayrd/run-task: waiting on task" task-id "...")
+    (info "drake.vineayrd/run-task: waiting on task: " task-id "...")
     (try
       (wait-for conf task-id)
       (finally (fs/delete (task-file conf task))))))
