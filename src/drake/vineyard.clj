@@ -18,8 +18,7 @@
   (spit (task-file conf task) task-id))
 
 (defn read-when [file]
-  (when
-      (fs/exists? task-file) (slurp task-file)))
+  (when (fs/exists? task-file) (slurp task-file)))
 
 (defn active-task-id
   "Looks for a local task file representing the specified task.
@@ -34,15 +33,15 @@
   (TaskQueue. host (Integer/parseInt port) resource))
 
 (defn push-new-task
-  "Pushes a new task using the specfied conf and task data.
+  "Pushes a new task using the specified conf and task data.
    Saves the task's unique task id to a local file representing the task.
    Returns the task's unique task id."
   [{:keys [host port resource] :as conf} task]
   (let [q (task-queue host port resource)
-        _ (println "drake.vineayrd/push-new-task: Pushing task to" host port resource "...")
+        _ (println "drake.vineyard/push-new-task: Pushing task to" host port resource "...")
         task-id (.addTask q task)]
     (create-task-file conf task task-id)
-    (println "drake.vineayrd/push-new-task: Pushed task" task-id)
+    (println "drake.vineyard/push-new-task: Pushed task" task-id)
     task-id))
 
 (defn done? [task]
@@ -64,7 +63,7 @@
   (let [task-id (or
                  (active-task-id conf task)
                  (push-new-task conf task))]
-    (println "drake.vineayrd/run-task: waiting on task" task-id "...")
+    (println "drake.vineyard/run-task: waiting on task" task-id "...")
     (wait-for conf task-id)
     (fs/delete (task-file conf task))))
 
