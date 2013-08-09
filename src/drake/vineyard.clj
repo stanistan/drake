@@ -11,7 +11,8 @@
 (defn fingerprint
   "Returns a unique fingerprint derived from the vineyard-specific values of the step."
   [conf task]
-  (.hashCode (merge conf task)))
+  (comment (.hashCode (merge conf task)))
+  (str (java.util.UUID/randomUUID))) ; NOTE(Myron) for now, make it completely random because I was getting collisions
 
 (defn task-file [conf task]
   (fs/file (str (fingerprint conf task) ".task")))
