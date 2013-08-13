@@ -3,6 +3,9 @@
   :url "https://github.com/Factual/drake"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :repositories {"factual" "http://maven.corp.factual.com/nexus/content/groups/public"
+                 "releases" "http://maven.corp.factual.com/nexus/content/repositories/releases"
+                 "snapshots" "http://maven.corp.factual.com/nexus/content/repositories/snapshots"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/tools.logging "0.2.3"]
                  [clj-logging-config "1.9.6"]

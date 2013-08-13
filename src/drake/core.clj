@@ -815,12 +815,9 @@
         ;; also, the defaults are specified here.
         options (into {:workflow "./Drakefile"
                        :logfile "drake.log"
-<<<<<<< HEAD
                        :plugins PLUGINS-FILE
-                       :tmpdir ".drake"}
-=======
+                       :tmpdir ".drake"
                        :jobs 1}
->>>>>>> guillaume-async
                       (for [[k v] options] [k (if (nil? v) true v)]))]
     (flush)    ;; we need to do it for help to always print out
     (let [targets (if (empty? targets) ["=..."] targets)]
