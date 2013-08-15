@@ -30,7 +30,7 @@
                  [clj-aws-s3 "0.3.3"]
 
                  ;; experimental support for vineyard
-                 [factual/vineyard-java-driver "1.7.2"]]
+                 [factual/vineyard-java-driver "1.7.6"]]
   :test-selectors {:regression   :regression
                    :default      (complement :regression)
                    :all          (constantly true)}

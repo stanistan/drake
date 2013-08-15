@@ -55,7 +55,8 @@
   (let [task (.getTask (task-queue host port resource) task-id)]
     (loop []
       (when-not (done? task)
-        (Thread/sleep 1500)
+        (info "drake.vineayrd/run-task: waiting on task: " task-id "...")
+        (Thread/sleep 5000)
         (recur)))
    (when (= vineyard.Task$Status/ERROR (.getStatusRemote task))
      (throw (Exception. (str "Error running Vineyard task: " task-id))))))
