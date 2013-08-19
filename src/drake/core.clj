@@ -26,9 +26,10 @@
 
 (def VERSION "0.1.3-vineyard-empty-dir-async")
 
-(defn set-jobs-semaphore [jobs-num]
-  (def ^:dynamic *jobs-semaphore*  (new Semaphore jobs-num)))
+(def first-exception (promise))
 
+(defn set-jobs-semaphore [jobs-num]
+  (def ^:dynamic *jobs-semaphore*  (new Semaphore jobs-num true)))
 
 ;; TODO(artem)
 ;; Optimize for repeated BASE prefixes (we can't just show it
@@ -386,6 +387,7 @@
         )
       (catch Exception e 
         (error "caught exception: " (.getMessage e))
+        (deliver first-exception e)
         )
       (finally
         ; if promise not delivered, deliver a promise of 0/failure
@@ -414,6 +416,9 @@
               (deliver prom 0)
               )
             )
+          (catch Exception e
+            (deliver first-exception e)
+            )
           (finally 
             (when (not (realized? prom))
               (deliver prom 0)) 
@@ -440,9 +445,9 @@
 (defn- trigger-futures [steps]
   "Triggers future callbacks in each steps"
   (do
-    (doseq [step steps] (do
+    (doseq [step steps]
       ((:future step))
-    ))
+    )
   )
 )
 
@@ -479,7 +484,9 @@
           (info "")
           (info (format "Done (%d steps run)." successful-steps))      
           (when (not= successful-steps (count steps))
-            (throw+ {:msg (str "successful-steps (" successful-steps ") does not equal total steps (" (count steps) ")")}))
+            (if (realized? first-exception)
+              (throw @first-exception)
+              (throw+ {:msg (str "successful-steps (" successful-steps ") does not equal total steps (" (count steps) ")")})))
           )
         )
       )
