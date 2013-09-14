@@ -2,9 +2,11 @@
   (:refer-clojure :exclude [file-seq])
   (:require [fs.core :as fs]
             [hdfs.core :as hdfs]
-            [aws.sdk.s3 :as s3])
+            [aws.sdk.s3 :as s3]
+            [drake.plugins :as plugins])
   (:use [slingshot.slingshot :only [throw+]]
         [clojure.string :only [join split]]
+        drake-interface.core
         drake.shell
         drake.options)
   (:import org.apache.hadoop.conf.Configuration
@@ -50,18 +52,6 @@
   (let [spl (split filename #"/" -1)]
     (str (if (empty? (first spl)) "/" "")
          (join "/" (filter (complement empty?) spl)))))
-
-(defprotocol FileSystem
-  (exists? [_ path])
-  (directory? [_ path])
-  (mod-time [_ path])
-  (file-seq [_ path])
-  (file-info [_ path])
-  (file-info-seq [_ path])
-  (data-in? [_ path])
-  (normalized-filename [_ path])
-  (rm [_ path])
-  (mv [_ from to]))
 
 ;; TODO(artem)
 ;; I tried a lot of things but still don't know how to create a common
@@ -385,14 +375,15 @@
    "test" (MockFileSystem. MOCK-FILESYSTEM-DATA)})
 
 (defn get-fs
-  "Determines the filesystem by prefix, defaults to the local filesystem
-   if the prefix is unknown."
+  "Determines the filesystem by prefix, first checking built-in FILESYSTEMS then
+   plugin filesystems. Defaults to the local filesystem if not found."
   [path]
   (let [[prefix filename] (split-path path)
-        filesystem (FILESYSTEMS prefix)]
-    (if (nil? filesystem)
-      [(FILESYSTEMS "file") "file" path]
-      [filesystem prefix filename])))
+        filesystem (or (FILESYSTEMS prefix)
+                       (plugins/get-reified "drake.fs." prefix)
+                       (FILESYSTEMS "file"))]
+    (println "drake fs.clj/get-fs: path=" path "returning:" filesystem)
+    [filesystem prefix filename]))
 
 (defn fs
   "Automatically determines the filesystem from the filename and dispatched
